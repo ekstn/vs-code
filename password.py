@@ -88,7 +88,6 @@ def change_password(user_id, fernet):
 def main():
 
     key = load_key()
-
     fernet = Fernet(key)
 
     while True:
@@ -96,11 +95,11 @@ def main():
         choice = input("선택: ")
 
         if choice == "1":
-            user_id = input("아이디 입력: ")
+            user_id = input("아이디 입력: ").strip()
             if find_user(user_id):
                 print("이미 존재하는 아이디입니다.")
                 continue
-            pw = input("비밀번호 입력: ")
+            pw = input("비밀번호 입력: ").strip()
             password = input("비밀번호 확인: ").strip()
             if pw !=password:
                 print("비밀번호가 일치하지 않습니다.")
@@ -114,12 +113,12 @@ def main():
             print("회원가입 완료!")
 
         elif choice == "2":
-            user_id = input("아이디 입력: ")
+            user_id = input("아이디 입력: ").strip()
             stored_pw_enc = find_user(user_id)
             if not stored_pw_enc:
                 print("등록되지 않은 아이디입니다.")
                 continue
-            password = input("비밀번호 입력: ")
+            password = input("비밀번호 입력: ").strip()
             try:
                 decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
                 if password == decrypted_pw:
