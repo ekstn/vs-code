@@ -99,14 +99,19 @@ def main():
             if find_user(user_id):
                 print("이미 존재하는 아이디입니다.")
                 continue
-            pw = input("비밀번호 입력: ").strip()
-            password = input("비밀번호 확인: ").strip()
-            if pw !=password:
-                print("비밀번호가 일치하지 않습니다.")
-                continue
-            if len(pw) < 4:
-                print("비밀번호는 4자 이상이어야 합니다.")
-                continue
+
+            while True:
+                pw = input("비밀번호 입력: ").strip()
+                pw_confirm = input("비밀번호 확인: ").strip()
+
+                if pw != pw_confirm:
+                    print("비밀번호가 일치하지 않습니다. 다시 입력하세요.")
+                    continue
+                if len(pw) < 4:
+                    print("비밀번호는 4자 이상이어야 합니다.")
+                    continue
+                break
+
             encrypted_pw = fernet.encrypt(pw.encode())
             save_user(user_id, encrypted_pw)
             write_log("회원가입", user_id)
@@ -118,16 +123,21 @@ def main():
             if not stored_pw_enc:
                 print("등록되지 않은 아이디입니다.")
                 continue
-            password = input("비밀번호 입력: ").strip()
-            try:
-                decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
-                if password == decrypted_pw:
-                    write_log("로그인", user_id)
-                    print("로그인 성공!")
-                else:
-                    print("비밀번호가 틀렸습니다.")
-            except:
-                print("복호화 오류 발생")
+
+            while True:
+                
+                password = input("비밀번호 입력: ").strip()
+                try:
+                    decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
+                    if password == decrypted_pw:
+                        write_log("로그인", user_id)
+                        print("로그인 성공!")
+                        break
+                    else:
+                        print("비밀번호가 틀렸습니다.")
+                except:
+                    print("복호화 오류 발생")
+                    break
 
         elif choice == "3":
             user_id = input("아이디 입력: ").strip()
