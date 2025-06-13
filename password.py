@@ -175,6 +175,6 @@ btn_frame2.pack(pady=5)
 tk.Button(btn_frame2, text="비밀번호 변경", width=15, command=change_password).pack(side="left", padx=5)
 tk.Button(btn_frame2, text="회원 탈퇴", width=15, command=delete_account).pack(side="left", padx=5)
 
-tk.Button(root, text="종료", fg="red", width=20, command=root.quit).pack(pady=10)
+tk.Button(root, text="종료", bg="red", fg="white", width=7, command=root.quit).pack(pady=10)
 
 root.mainloop()
