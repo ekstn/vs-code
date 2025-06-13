@@ -36,6 +36,17 @@ def find_user(user_id):
     return None
 
 
+def delete_user(user_id):
+    if not os.path.exists(user_db):
+        return
+    with open(user_db, "r") as f:
+        lines = f.readlines()
+    with open(user_db, "w") as f:
+        for line in lines:
+            if not line.startswith(user_id + " "):
+                f.write(line)
+
+
 def main():
 
     key = load_key()
@@ -43,7 +54,7 @@ def main():
     fernet = Fernet(key)
 
     while True:
-        print("\n1. 회원가입  2. 로그인  3. 종료")
+        print("\n1. 회원가입  2. 로그인  3.사용자 탈퇴  4. 종료")
         choice = input("선택: ")
 
         if choice == "1":
@@ -71,7 +82,26 @@ def main():
                     print("비밀번호가 틀렸습니다.")
             except:
                 print("복호화 오류 발생")
+
         elif choice == "3":
+            user_id = input("아이디 입력: ").strip()
+            pw = input("비밀번호 입력: ").strip()
+            stored_pw_enc = find_user(user_id)
+            if not stored_pw_enc:
+                print("등록되지 않은 아이디입니다.")
+                continue
+            try:
+                decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
+                if pw == decrypted_pw:
+                    delete_user(user_id)
+                    print("사용자 탈퇴 완료.")
+                else:
+                    print("비밀번호가 틀렸습니다.")
+            except:
+                print("복호화 오류 발생")
+
+
+        elif choice == "4":
             print("프로그램 종료")
             break
         else:
