@@ -51,3 +51,22 @@ def main():
             encrypted_pw = fernet.encrypt(password.encode())
             save_user(user_id, encrypted_pw)
             print("회원가입 완료!")
+
+        elif choice == "2":
+            user_id = input("아이디 입력: ")
+            stored_pw_enc = find_user(user_id)
+            if not stored_pw_enc:
+                print("등록되지 않은 아이디입니다.")
+                continue
+            password = input("비밀번호 입력: ")
+            try:
+                decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
+                if password == decrypted_pw:
+                    print("로그인 성공!")
+                else:
+                    print("비밀번호가 틀렸습니다.")
+            except:
+                print("복호화 오류 발생")
+        elif choice == "3":
+            print("프로그램 종료")
+            break
