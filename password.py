@@ -54,6 +54,37 @@ def delete_user(user_id):
                 f.write(line)
 
 
+def change_password(user_id, fernet):
+    current_pw = input("현재 비밀번호 입력: ")
+    stored_pw_enc = find_user(user_id)
+    if not stored_pw_enc:
+        print("사용자 정보 없음.")
+        return
+    try:
+        decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
+        if decrypted_pw != current_pw:
+            print("현재 비밀번호가 일치하지 않습니다.")
+            return
+    except:
+        print("복호화 오류")
+        return
+
+    new_pw = input("새 비밀번호 입력: ")
+    new_pw_confirm = input("새 비밀번호 확인: ")
+    if new_pw != new_pw_confirm:
+        print("비밀번호 불일치.")
+        return
+    if len(new_pw) < 4:
+        print("비밀번호는 4자 이상이어야 합니다.")
+        return
+
+    encrypted_pw = fernet.encrypt(new_pw.encode())
+    delete_user(user_id)
+    save_user(user_id, encrypted_pw)
+    print("비밀번호 변경 완료.")
+    write_log("비밀번호 변경", user_id)
+
+
 def main():
 
     key = load_key()
@@ -61,7 +92,7 @@ def main():
     fernet = Fernet(key)
 
     while True:
-        print("\n1. 회원가입  2. 로그인  3.사용자 탈퇴  4. 종료")
+        print("\n1. 회원가입  2. 로그인  3. 비밀번호 변경  4. 사용자 탈퇴  5. 종료")
         choice = input("선택: ")
 
         if choice == "1":
@@ -94,6 +125,10 @@ def main():
 
         elif choice == "3":
             user_id = input("아이디 입력: ").strip()
+            change_password(user_id, fernet)
+
+        elif choice == "4":
+            user_id = input("아이디 입력: ").strip()
             pw = input("비밀번호 입력: ").strip()
             stored_pw_enc = find_user(user_id)
             if not stored_pw_enc:
@@ -111,7 +146,7 @@ def main():
                 print("복호화 오류 발생")
 
 
-        elif choice == "4":
+        elif choice == "5":
             print("프로그램 종료")
             break
         else:
@@ -120,4 +155,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
