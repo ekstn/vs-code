@@ -17,3 +17,8 @@ def load_key():
         with open(key, "wb") as f:
             f.write(key)
         return key
+    
+def save_user(user_id, encrypted_pw):
+    with open(user_db, "a") as f:
+        f.write(f"{user_id} {encrypted_pw.decode()}\n")
+
