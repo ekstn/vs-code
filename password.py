@@ -8,6 +8,7 @@ user_db = "users.txt"
 
 key_file = "secret.key"
 
+
 def load_key():
     if os.path.exists(key_file):
         with open(key_file, "rb") as f:
@@ -18,9 +19,11 @@ def load_key():
             f.write(new_key)
         return new_key
     
+
 def save_user(user_id, encrypted_pw):
     with open(user_db, "a") as f:
         f.write(f"{user_id} {encrypted_pw.decode()}\n")
+
 
 def find_user(user_id):
     if not os.path.exists(user_db):
@@ -31,6 +34,7 @@ def find_user(user_id):
             if stored_id == user_id:
                 return stored_pw.encode()
     return None
+
 
 def main():
 
@@ -72,6 +76,7 @@ def main():
             break
         else:
             print("올바른 선택이 아닙니다.")
+
 
 if __name__ == "__main__":
     main()
