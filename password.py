@@ -74,6 +74,7 @@ def main():
             password = input("비밀번호 입력: ")
             encrypted_pw = fernet.encrypt(password.encode())
             save_user(user_id, encrypted_pw)
+            write_log("회원가입", user_id)
             print("회원가입 완료!")
 
         elif choice == "2":
@@ -86,6 +87,7 @@ def main():
             try:
                 decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
                 if password == decrypted_pw:
+                    write_log("로그인", user_id)
                     print("로그인 성공!")
                 else:
                     print("비밀번호가 틀렸습니다.")
@@ -103,6 +105,7 @@ def main():
                 decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
                 if pw == decrypted_pw:
                     delete_user(user_id)
+                    write_log("탈퇴", user_id)
                     print("사용자 탈퇴 완료.")
                 else:
                     print("비밀번호가 틀렸습니다.")
