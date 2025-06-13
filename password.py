@@ -70,3 +70,8 @@ def main():
         elif choice == "3":
             print("프로그램 종료")
             break
+        else:
+            print("올바른 선택이 아닙니다.")
+
+if __name__ == "__main__":
+    main()
