@@ -6,17 +6,17 @@ from cryptography.fernet import Fernet
 
 user_db = "users.txt"
 
-key = "secret.key"
+key_file = "secret.key"
 
 def load_key():
-    if os.path.exists(key):
-        with open(key, "rb") as f:
+    if os.path.exists(key_file):
+        with open(key_file, "rb") as f:
             return f.read()
     else:
-        key = Fernet.generate_key()
-        with open(key, "wb") as f:
-            f.write(key)
-        return key
+        new_key = Fernet.generate_key()
+        with open(key_file, "wb") as f:
+            f.write(new_key)
+        return new_key
     
 def save_user(user_id, encrypted_pw):
     with open(user_db, "a") as f:
