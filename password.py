@@ -100,8 +100,15 @@ def main():
             if find_user(user_id):
                 print("이미 존재하는 아이디입니다.")
                 continue
-            password = input("비밀번호 입력: ")
-            encrypted_pw = fernet.encrypt(password.encode())
+            pw = input("비밀번호 입력: ")
+            password = input("비밀번호 확인: ").strip()
+            if pw !=password:
+                print("비밀번호가 일치하지 않습니다.")
+                continue
+            if len(pw) < 4:
+                print("비밀번호는 4자 이상이어야 합니다.")
+                continue
+            encrypted_pw = fernet.encrypt(pw.encode())
             save_user(user_id, encrypted_pw)
             write_log("회원가입", user_id)
             print("회원가입 완료!")
