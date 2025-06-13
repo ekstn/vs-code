@@ -113,6 +113,9 @@ def change_password():
         messagebox.showerror("오류", "복호화 오류")
         return
 
+    if new_pw == current_pw:
+        messagebox.showerror("오류", "새 비밀번호는 현재 비밀번호와 달라야 합니다.")
+        return
     if len(new_pw) < 4:
         messagebox.showerror("오류", "비밀번호는 4자 이상이어야 합니다.")
         return
@@ -162,10 +165,16 @@ tk.Label(root, text="비밀번호 확인 or 변경할 비밀번호:").pack()
 confirm_entry = tk.Entry(root, show="*")
 confirm_entry.pack()
 
-tk.Button(root, text="회원가입", command=register).pack(pady=5)
-tk.Button(root, text="로그인", command=login).pack(pady=5)
-tk.Button(root, text="비밀번호 변경", command=change_password).pack(pady=5)
-tk.Button(root, text="회원 탈퇴", command=delete_account).pack(pady=5)
-tk.Button(root, text="종료", command=root.quit).pack(pady=5)
+btn_frame1 = tk.Frame(root)
+btn_frame1.pack(pady=5)
+tk.Button(btn_frame1, text="회원가입", width=15, command=register).pack(side="left", padx=5)
+tk.Button(btn_frame1, text="로그인", width=15, command=login).pack(side="left", padx=5)
+
+btn_frame2 = tk.Frame(root)
+btn_frame2.pack(pady=5)
+tk.Button(btn_frame2, text="비밀번호 변경", width=15, command=change_password).pack(side="left", padx=5)
+tk.Button(btn_frame2, text="회원 탈퇴", width=15, command=delete_account).pack(side="left", padx=5)
+
+tk.Button(root, text="종료", fg="red", width=20, command=root.quit).pack(pady=10)
 
 root.mainloop()
