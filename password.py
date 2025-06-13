@@ -4,6 +4,8 @@
 import os
 from cryptography.fernet import Fernet
 from datetime import datetime
+import tkinter as tk
+from tkinter import messagebox
 
 user_db = "users.txt"
 key_file = "secret.key"
@@ -53,121 +55,117 @@ def delete_user(user_id):
             if not line.startswith(user_id + " "):
                 f.write(line)
 
+def register():
+    user_id = id_entry.get().strip()
+    pw = pw_entry.get().strip()
+    pw_confirm = confirm_entry.get().strip()
 
-def change_password(user_id, fernet):
-    current_pw = input("현재 비밀번호 입력: ")
+    if find_user(user_id):
+        messagebox.showerror("오류", "이미 존재하는 아이디입니다.")
+        return
+    if pw != pw_confirm:
+        messagebox.showerror("오류", "비밀번호가 일치하지 않습니다.")
+        return
+    if len(pw) < 4:
+        messagebox.showerror("오류", "비밀번호는 4자 이상이어야 합니다.")
+        return
+
+    encrypted_pw = fernet.encrypt(pw.encode())
+    save_user(user_id, encrypted_pw)
+    write_log("회원가입", user_id)
+    messagebox.showinfo("성공", "회원가입 완료!")
+
+def login():
+    user_id = id_entry.get().strip()
+    pw = pw_entry.get().strip()
+    stored_pw_enc = find_user(user_id)
+
+    if not stored_pw_enc:
+        messagebox.showerror("오류", "등록되지 않은 아이디입니다.")
+        return
+
+    try:
+        decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
+        if pw == decrypted_pw:
+            write_log("로그인", user_id)
+            messagebox.showinfo("성공", "로그인 성공!")
+        else:
+            messagebox.showerror("오류", "비밀번호가 틀렸습니다.")
+    except:
+        messagebox.showerror("오류", "복호화 오류 발생")
+
+def change_password():
+    user_id = id_entry.get().strip()
+    current_pw = pw_entry.get().strip()
+    new_pw = confirm_entry.get().strip()
+
     stored_pw_enc = find_user(user_id)
     if not stored_pw_enc:
-        print("사용자 정보 없음.")
+        messagebox.showerror("오류", "사용자 정보 없음.")
         return
+
     try:
         decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
         if decrypted_pw != current_pw:
-            print("현재 비밀번호가 일치하지 않습니다.")
+            messagebox.showerror("오류", "현재 비밀번호가 일치하지 않습니다.")
             return
     except:
-        print("복호화 오류")
+        messagebox.showerror("오류", "복호화 오류")
         return
 
-    new_pw = input("새 비밀번호 입력: ")
-    new_pw_confirm = input("새 비밀번호 확인: ")
-    if new_pw != new_pw_confirm:
-        print("비밀번호 불일치.")
-        return
     if len(new_pw) < 4:
-        print("비밀번호는 4자 이상이어야 합니다.")
+        messagebox.showerror("오류", "비밀번호는 4자 이상이어야 합니다.")
         return
 
     encrypted_pw = fernet.encrypt(new_pw.encode())
     delete_user(user_id)
     save_user(user_id, encrypted_pw)
-    print("비밀번호 변경 완료.")
     write_log("비밀번호 변경", user_id)
+    messagebox.showinfo("성공", "비밀번호 변경 완료")
 
+def delete_account():
+    user_id = id_entry.get().strip()
+    pw = pw_entry.get().strip()
+    stored_pw_enc = find_user(user_id)
 
-def main():
-
-    key = load_key()
-    fernet = Fernet(key)
-
-    while True:
-        print("\n1. 회원가입  2. 로그인  3. 비밀번호 변경  4. 사용자 탈퇴  5. 종료")
-        choice = input("선택: ")
-
-        if choice == "1":
-            user_id = input("아이디 입력: ").strip()
-            if find_user(user_id):
-                print("이미 존재하는 아이디입니다.")
-                continue
-
-            while True:
-                pw = input("비밀번호 입력: ").strip()
-                pw_confirm = input("비밀번호 확인: ").strip()
-
-                if pw != pw_confirm:
-                    print("비밀번호가 일치하지 않습니다. 다시 입력하세요.")
-                    continue
-                if len(pw) < 4:
-                    print("비밀번호는 4자 이상이어야 합니다.")
-                    continue
-                break
-
-            encrypted_pw = fernet.encrypt(pw.encode())
-            save_user(user_id, encrypted_pw)
-            write_log("회원가입", user_id)
-            print("회원가입 완료!")
-
-        elif choice == "2":
-            user_id = input("아이디 입력: ").strip()
-            stored_pw_enc = find_user(user_id)
-            if not stored_pw_enc:
-                print("등록되지 않은 아이디입니다.")
-                continue
-
-            while True:
-                
-                password = input("비밀번호 입력: ").strip()
-                try:
-                    decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
-                    if password == decrypted_pw:
-                        write_log("로그인", user_id)
-                        print("로그인 성공!")
-                        break
-                    else:
-                        print("비밀번호가 틀렸습니다.")
-                except:
-                    print("복호화 오류 발생")
-                    break
-
-        elif choice == "3":
-            user_id = input("아이디 입력: ").strip()
-            change_password(user_id, fernet)
-
-        elif choice == "4":
-            user_id = input("아이디 입력: ").strip()
-            pw = input("비밀번호 입력: ").strip()
-            stored_pw_enc = find_user(user_id)
-            if not stored_pw_enc:
-                print("등록되지 않은 아이디입니다.")
-                continue
-            try:
-                decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
-                if pw == decrypted_pw:
-                    delete_user(user_id)
-                    write_log("탈퇴", user_id)
-                    print("사용자 탈퇴 완료.")
-                else:
-                    print("비밀번호가 틀렸습니다.")
-            except:
-                print("복호화 오류 발생")
-
-
-        elif choice == "5":
-            print("프로그램 종료")
-            break
+    if not stored_pw_enc:
+        messagebox.showerror("오류", "등록되지 않은 아이디입니다.")
+        return
+    try:
+        decrypted_pw = fernet.decrypt(stored_pw_enc).decode()
+        if pw == decrypted_pw:
+            delete_user(user_id)
+            write_log("탈퇴", user_id)
+            messagebox.showinfo("성공", "사용자 탈퇴 완료")
         else:
-            print("올바른 선택이 아닙니다.")
+            messagebox.showerror("오류", "비밀번호가 틀렸습니다.")
+    except:
+        messagebox.showerror("오류", "복호화 오류")
 
 
-if __name__ == "__main__":
-    main()
+key = load_key()
+fernet = Fernet(key)
+
+root = tk.Tk()
+root.title("암호화 회원관리 시스템")
+root.geometry("400x300")
+
+tk.Label(root, text="아이디:").pack()
+id_entry = tk.Entry(root)
+id_entry.pack()
+
+tk.Label(root, text="비밀번호:").pack()
+pw_entry = tk.Entry(root, show="*")
+pw_entry.pack()
+
+tk.Label(root, text="비밀번호 확인 or 변경할 비밀번호:").pack()
+confirm_entry = tk.Entry(root, show="*")
+confirm_entry.pack()
+
+tk.Button(root, text="회원가입", command=register).pack(pady=5)
+tk.Button(root, text="로그인", command=login).pack(pady=5)
+tk.Button(root, text="비밀번호 변경", command=change_password).pack(pady=5)
+tk.Button(root, text="회원 탈퇴", command=delete_account).pack(pady=5)
+tk.Button(root, text="종료", command=root.quit).pack(pady=5)
+
+root.mainloop()
