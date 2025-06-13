@@ -6,9 +6,7 @@ from cryptography.fernet import Fernet
 from datetime import datetime
 
 user_db = "users.txt"
-
 key_file = "secret.key"
-
 log_file = "log.txt"
 
 
@@ -122,3 +120,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
